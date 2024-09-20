@@ -30,5 +30,5 @@ async_session = async_sessionmaker(bind=engine, class_=AsyncSession)
 
 @contextlib.asynccontextmanager
 async def create_session() -> AsyncIterator[AsyncSession]:
-    async with async_session() as session:
+    async with async_session.begin() as session:
         yield session

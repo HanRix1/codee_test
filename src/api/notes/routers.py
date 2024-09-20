@@ -5,7 +5,7 @@ from sqlalchemy import insert, select
 
 from api.auth.dependencies import JWTBearer
 from api.notes.schemes import CreateNoteSchema, ListNoteSchema, NoteSchema
-from db.base import create_session
+from db.base import async_session
 from db.models import Note
 
 router = APIRouter(
@@ -16,16 +16,17 @@ router = APIRouter(
 
 @router.get("/")
 async def get_notes_list(
-    user=Depends(JWTBearer()), session=Depends(create_session)
+    user=Depends(JWTBearer())
 ) -> list[NoteSchema]:
-    query = select(Note.text, Note.created_at).where(Note.user_id == user["user_id"])
-    result = (await session.scalars(query)).all()
+    async with async_session() as session:
+        query = select(Note.text, Note.created_at).where(Note.user_id == user["user_id"])
+        result = (await session.scalars(query)).all()
     return ListNoteSchema.validate_python(result)
 
 
 @router.post("/")
 async def create_note(
-    data: CreateNoteSchema, user=Depends(JWTBearer()), session=Depends(create_session)
+    data: CreateNoteSchema, user=Depends(JWTBearer())
 ):
     url = f'https://speller.yandex.net/services/spellservice.json/checkText?text={data.text.replace(' ', '+')}'
 
@@ -39,7 +40,8 @@ async def create_note(
             after = data.text[el["len"] + el["pos"] :]
             data.text = before + el["s"][0] + after
 
-    query = insert(Note).values(text=data.text, user_id=user["user_id"])
-    await session.execute(query)
-    await session.commit()
+    async with async_session() as session:
+        query = insert(Note).values(text=data.text, user_id=user["user_id"])
+        await session.execute(query)
+        await session.commit()
     return Response(status_code=status.HTTP_201_CREATED)
