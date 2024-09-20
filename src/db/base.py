@@ -25,10 +25,10 @@ class Base(DeclarativeBase):
 
 settings: DatabaseSettings = get_settings(DatabaseSettings)
 engine: AsyncEngine = create_async_engine(settings.async_url)
-async_session: AsyncSession = async_sessionmaker(bind=engine, class_=AsyncSession)
+async_session = async_sessionmaker(bind=engine, class_=AsyncSession)
 
 
 @contextlib.asynccontextmanager
 async def create_session() -> AsyncIterator[AsyncSession]:
-    async with async_session.begin() as session:
+    async with async_session() as session:
         yield session

@@ -9,7 +9,7 @@ dependencies = [
     "fastapi>=0.115.0",
     "uvicorn>=0.30.6",
     "python-dotenv>=1.0.1",
-    "sqlalchemy>=2.0.35",
+    "sqlalchemy[asyncio]>=2.0.35",
     "alembic>=1.13.2",
     "pydantic-settings>=2.5.2",
     "psycopg2>=2.9.9",
@@ -34,3 +34,8 @@ dev = [
     "mypy>=1.11.2",
     "isort>=5.13.2",
 ]
+[tool.mypy]
+plugins=["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
+exclude="alembic"
+follow_imports="silent"
+ignore_missing_imports=true

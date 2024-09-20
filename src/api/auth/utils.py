@@ -3,9 +3,9 @@ from uuid import UUID
 
 import jwt
 
-from settings import AuthSettings, get_settings
+from src.settings import AuthSettings, get_settings
 
-setting: AuthSettings = get_settings(AuthSettings)
+setting: AuthSettings = get_settings(AuthSettings)  # type: ignore
 
 
 def token_response(token: str):

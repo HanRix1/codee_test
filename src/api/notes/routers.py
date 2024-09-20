@@ -26,7 +26,7 @@ async def get_notes_list(
 @router.post("/")
 async def create_note(
     data: CreateNoteSchema, user=Depends(JWTBearer()), session=Depends(create_session)
-) -> None:
+):
     url = f'https://speller.yandex.net/services/spellservice.json/checkText?text={data.text.replace(' ', '+')}'
 
     async with aiohttp.ClientSession() as session:
